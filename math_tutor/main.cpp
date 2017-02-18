@@ -46,7 +46,7 @@ int main()
         "Oh bravo. You're an inspiration to us all."
     };
     string snarky_negative_response_pool[] = {
-        "Trum says: WRONG!!!",
+        "Trump says: WRONG!!!",
         "You need help.",
         "You forgot to carry the 1, genius.",
         "Oh COME ON..."
