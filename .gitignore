@@ -1,4 +1,11 @@
+## Linux Vi Workspace
 prog
 workspace/
 *.swp
 
+## Windows Code::Blocks Workspace
+*.exe
+*.cbp
+*.depend
+*.layout
+*.o
