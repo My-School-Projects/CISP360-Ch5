@@ -2,52 +2,37 @@
 #include <random>
 using namespace std;
 
-enum SnarkyResponseType
+enum snarky_response_t
 {
     positive, negative
 };
 
-string get_snarky_response(SnarkyResponseType, mt19937);
+typedef struct {
+    unsigned given;
+    unsigned correct;
+} answer_t;
+
+typedef mt19937 RNG;
+
+unsigned get_number_in_range(unsigned, unsigned, RNG);
+string get_snarky_response(snarky_response_t, RNG);
+answer_t do_addition(RNG);
+answer_t do_subtraction(RNG);
+answer_t do_multiplication(RNG);
+answer_t do_division(RNG);
 
 int main()
 {
     // The default seed generator
     random_device rd;
     // A random number generator (seeded with rd)
-    mt19937 rng(rd());
+    RNG rng(rd());
 
-    // We generate random numbers with uniform distributions
-    // which are bounded by their minimum and maximum values.
-    //
-    // We want everything in 3 digit numbers, so
-    // the minimum value for the sum is 200 (100 + 100)
-    // and the maximum value is 999.
-    uniform_int_distribution<> sum_dist(200, 999);
-    // Assign sum a random number between 200 and 999
-    unsigned sum = sum_dist(rng);
+    answer_t answer;
 
-    // The addend must be at least 100, and cannot be more than
-    // sum - 100, because the augend must be at least 100,
-    // and addend + augend = sum.
-    uniform_int_distribution<> addend_dist(100, sum - 100);
-    unsigned addend = addend_dist(rng);
+    answer = do_addition(rng);
 
-    unsigned augend = sum - addend;
-
-    // Will be used to take user input
-    unsigned input;
-
-
-
-    cout << endl << endl
-         << "   " << addend << endl
-         << " + " << augend << endl
-         << "------" << endl;
-
-    cout << "   ";
-    cin >> input;
-
-    if (input == sum)
+    if (answer.given == answer.correct)
     {
         string response = get_snarky_response(positive, rng);
         cout << endl
@@ -58,11 +43,35 @@ int main()
         string response = get_snarky_response(negative, rng);
         cout << response << endl
              << endl
-             << "The answer is " << sum << endl;
+             << "The answer is " << answer.correct << endl;
     }
 }
 
-string get_snarky_response(SnarkyResponseType response_type, mt19937 rng)
+answer_t do_addition(RNG rng)
+{
+    answer_t answer;
+    answer.correct = get_number_in_range(200, 999, rng);
+    unsigned addend = get_number_in_range(100, answer.correct - 100, rng);
+    unsigned augend = answer.correct - addend;
+
+    cout << endl << endl
+         << "   " << addend << endl
+         << " + " << augend << endl
+         << "------" << endl;
+
+    cout << "   ";
+    cin >> answer.given;
+
+    return answer;
+}
+
+unsigned get_number_in_range(unsigned range_start, unsigned range_end, RNG rng)
+{
+    uniform_int_distribution<> distribution(range_start, range_end);
+    return distribution(rng);
+}
+
+string get_snarky_response(snarky_response_t response_type, RNG rng)
 {
     // I want to generate a random snarky response, out of a pool
     // of snarky responses.
