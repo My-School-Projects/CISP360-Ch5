@@ -1,6 +1,5 @@
 #include <iostream>
 #include <random>
-#include <ctime>
 using namespace std;
 
 ///
@@ -22,27 +21,62 @@ answer_t do_addition(rng_t&);
 answer_t do_subtraction(rng_t&);
 answer_t do_multiplication(rng_t&);
 answer_t do_division(rng_t&);
+void respond_to_answer(answer_t, rng_t);
 
 int main()
 {
-    // Random number generator seeded with the current time
-    rng_t rng(time(0));
+    // Random number generator
+    random_device rd;
+    rng_t rng(rd());
 
-    answer_t answer;
+    while(true)
+    {
+        char operation;
+        answer_t answer;
 
-    answer = do_subtraction(rng);
+        cout << "Please enter an operation you would like to practice [+ - * /]"
+                 << endl << "or Q to quit."
+                 << endl << ">> ";
+            cin >> operation;
 
+        switch(operation)
+        {
+        case '+':
+            answer = do_addition(rng);
+            respond_to_answer(answer, rng);
+            break;
+        case '-':
+            answer = do_subtraction(rng);
+            respond_to_answer(answer, rng);
+            break;
+        case '*':
+            answer = do_multiplication(rng);
+            respond_to_answer(answer, rng);
+            break;
+        case '/':
+            answer = do_division(rng);
+            respond_to_answer(answer, rng);
+            break;
+        case 'q':
+        case 'Q':
+            return 0;
+        }
+    }
+}
+
+void respond_to_answer(answer_t answer, rng_t rng)
+{
     if (answer.given == answer.correct)
     {
         string response = get_snarky_response(true, rng);
         cout << endl
-             << response << endl;
+             << response << endl << endl;
     }
     else
     {
         string response = get_snarky_response(false, rng);
-        cout << response << endl
-             << endl
+        cout << endl
+             << response << endl << endl
              << "The answer is " << answer.correct << endl;
     }
 }
@@ -72,6 +106,13 @@ answer_t do_addition(rng_t& rng)
     return answer;
 }
 
+///
+/// Provides the user with a subtraction problem to solve.
+/// All numbers used will be 3 digits (including the answer).
+///
+/// Returns `answer_t`, which holds both the correct answer,
+/// and the answer provided by the user.
+///
 answer_t do_subtraction(rng_t& rng)
 {
     answer_t answer;
@@ -87,6 +128,18 @@ answer_t do_subtraction(rng_t& rng)
     cout << "   ";
     cin >> answer.given;
 
+    return answer;
+}
+
+answer_t do_multiplication(rng_t& rng)
+{
+    answer_t answer;
+    return answer;
+}
+
+answer_t do_division(rng_t& rng)
+{
+    answer_t answer;
     return answer;
 }
 
