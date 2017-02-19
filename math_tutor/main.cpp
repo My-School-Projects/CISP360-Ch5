@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <ctime>
 using namespace std;
 
 ///
@@ -17,20 +18,19 @@ typedef mt19937 rng_t;
 
 unsigned get_number_in_range(unsigned, unsigned, rng_t);
 string get_snarky_response(bool, rng_t);
-answer_t do_addition(rng_t);
-answer_t do_subtraction(rng_t);
-answer_t do_multiplication(rng_t);
-answer_t do_division(rng_t);
+answer_t do_addition(rng_t&);
+answer_t do_subtraction(rng_t&);
+answer_t do_multiplication(rng_t&);
+answer_t do_division(rng_t&);
 
 int main()
 {
-    // Random number generator
-    random_device rd;
-    rng_t rng(rd());
+    // Random number generator seeded with the current time
+    rng_t rng(time(0));
 
     answer_t answer;
 
-    answer = do_addition(rng);
+    answer = do_subtraction(rng);
 
     if (answer.given == answer.correct)
     {
@@ -54,16 +54,34 @@ int main()
 /// Returns `answer_t`, which holds both the correct answer,
 /// and the answer provided by the user.
 ///
-answer_t do_addition(rng_t rng)
+answer_t do_addition(rng_t& rng)
 {
     answer_t answer;
     answer.correct = get_number_in_range(200, 999, rng);
-    unsigned addend = get_number_in_range(100, answer.correct - 100, rng);
-    unsigned augend = answer.correct - addend;
+    unsigned n1 = get_number_in_range(100, answer.correct - 100, rng);
+    unsigned n2 = answer.correct - n1;
 
     cout << endl << endl
-         << "   " << addend << endl
-         << " + " << augend << endl
+         << "   " << n1 << endl
+         << " + " << n2 << endl
+         << "------" << endl;
+
+    cout << "   ";
+    cin >> answer.given;
+
+    return answer;
+}
+
+answer_t do_subtraction(rng_t& rng)
+{
+    answer_t answer;
+    answer.correct = get_number_in_range(100, 899, rng);
+    unsigned n1 = get_number_in_range(answer.correct + 100, 999, rng);
+    unsigned n2 = n1 - answer.correct;
+
+    cout << endl << endl
+         << "   " << n1 << endl
+         << " - " << n2 << endl
          << "------" << endl;
 
     cout << "   ";
