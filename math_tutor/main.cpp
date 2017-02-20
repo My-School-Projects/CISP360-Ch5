@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <chrono>
 using namespace std;
 
 ///
@@ -15,19 +16,19 @@ typedef struct {
 /// from here on referred to as RNG.
 typedef mt19937 rng_t;
 
-unsigned get_number_in_range(unsigned, unsigned, rng_t);
-string get_snarky_response(bool, rng_t);
+time_t get_current_time();
+unsigned get_number_in_range(unsigned, unsigned, rng_t&);
+string get_snarky_response(bool, rng_t&);
 answer_t do_addition(rng_t&);
 answer_t do_subtraction(rng_t&);
 answer_t do_multiplication(rng_t&);
 answer_t do_division(rng_t&);
-void respond_to_answer(answer_t, rng_t);
+void respond_to_answer(answer_t, rng_t&);
 
 int main()
 {
-    // Random number generator
-    random_device rd;
-    rng_t rng(rd());
+    // Random number generator (seeded from the system clock)
+    rng_t rng(get_current_time());
 
     while(true)
     {
@@ -64,7 +65,12 @@ int main()
     }
 }
 
-void respond_to_answer(answer_t answer, rng_t rng)
+///
+/// Responds to the user's input with either a "you got it right"
+/// or a "you got it wrong" (but snarky).
+/// Prints the correct answer if the user got it wrong.
+///
+void respond_to_answer(answer_t answer, rng_t& rng)
 {
     if (answer.given == answer.correct)
     {
@@ -131,9 +137,33 @@ answer_t do_subtraction(rng_t& rng)
     return answer;
 }
 
+///
+/// Provides the user with a multiplication problem to solve.
+/// The two multiplier and multiplicand will both be three digits,
+/// and the answer will be between 5 or 6 digits long.
+///
+/// Returns `answer_t`, which holds both the correct answer,
+/// and the answer provided by the user.
+///
 answer_t do_multiplication(rng_t& rng)
 {
     answer_t answer;
+    unsigned n1 = get_number_in_range(100, 999, rng);
+    unsigned n2 = get_number_in_range(100, 999, rng);
+    answer.correct = n1 * n2;
+
+    cout << endl << endl
+         << "   " << n1 << endl
+         << " * " << n2 << endl
+         << "------" << endl;
+
+    // if the answer is only 5 digits, pad over one space
+    if (answer.correct < 100000)
+    {
+        cout << " ";
+    }
+    cin >> answer.given;
+
     return answer;
 }
 
@@ -144,27 +174,16 @@ answer_t do_division(rng_t& rng)
 }
 
 ///
-/// Just a simple utility to return a random number from
-/// `range_start` to `range_end` (inclusive).
-///
-unsigned get_number_in_range(unsigned range_start, unsigned range_end, rng_t rng)
-{
-    uniform_int_distribution<> distribution(range_start, range_end);
-    return distribution(rng);
-}
-
-///
 /// Returns a random snarky response to the caller.
 /// If `answer_correct` is true, it will return a "correct answer" response.
 /// If `answer_correct` is false, it will return an "incorrect answer" response.
 ///
-string get_snarky_response(bool answer_correct, rng_t rng)
+string get_snarky_response(bool answer_correct, rng_t& rng)
 {
     // I want to generate a random snarky response, out of a pool
     // of snarky responses.
     // I need a random number to select which response I will use.
-    uniform_int_distribution<> snarky_response_dist(0, 3);
-    size_t snarky_response_index = snarky_response_dist(rng);
+    size_t snarky_response_index = get_number_in_range(0, 3, rng);
 
     // Here are my pools of snarky responses
     const string snarky_positive_response_pool[] = {
@@ -188,4 +207,22 @@ string get_snarky_response(bool answer_correct, rng_t rng)
     {
         return snarky_negative_response_pool[snarky_response_index];
     }
+}
+
+///
+/// Just a simple utility to return a random number from
+/// `range_start` to `range_end` (inclusive).
+///
+unsigned get_number_in_range(unsigned range_start, unsigned range_end, rng_t& rng)
+{
+    uniform_int_distribution<> distribution(range_start, range_end);
+    return distribution(rng);
+}
+
+///
+/// Get the current system time as a `time_t`.
+///
+time_t get_current_time()
+{
+    return chrono::system_clock::to_time_t(chrono::system_clock::now());
 }
