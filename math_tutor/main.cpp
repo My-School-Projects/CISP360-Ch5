@@ -12,9 +12,7 @@ typedef struct {
     unsigned correct;
 } answer_t;
 
-/// mt19937 is a random number generator (mersenne twister engine)
-/// from here on referred to as RNG.
-typedef mt19937 rng_t;
+typedef default_random_engine rng_t;
 
 time_t get_current_time();
 unsigned get_number_in_range(unsigned, unsigned, rng_t&);
