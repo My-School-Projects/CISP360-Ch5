@@ -139,8 +139,8 @@ answer_t do_subtraction(rng_t& rng)
 
 ///
 /// Provides the user with a multiplication problem to solve.
-/// The two multiplier and multiplicand will both be three digits,
-/// and the answer will be between 5 or 6 digits long.
+/// The two multiplier and multiplicand will both be two digits,
+/// and the answer will be between 3 or 4 digits long.
 ///
 /// Returns `answer_t`, which holds both the correct answer,
 /// and the answer provided by the user.
@@ -148,17 +148,18 @@ answer_t do_subtraction(rng_t& rng)
 answer_t do_multiplication(rng_t& rng)
 {
     answer_t answer;
-    unsigned n1 = get_number_in_range(100, 999, rng);
-    unsigned n2 = get_number_in_range(100, 999, rng);
+    unsigned n1 = get_number_in_range(10, 99, rng);
+    unsigned n2 = get_number_in_range(10, 99, rng);
     answer.correct = n1 * n2;
 
     cout << endl << endl
          << "   " << n1 << endl
          << " * " << n2 << endl
-         << "------" << endl;
+         << "-----" << endl
+         << " ";
 
-    // if the answer is only 5 digits, pad over one space
-    if (answer.correct < 100000)
+    // if the answer is only 3 digits, pad over one space
+    if (answer.correct < 1000)
     {
         cout << " ";
     }
@@ -170,6 +171,18 @@ answer_t do_multiplication(rng_t& rng)
 answer_t do_division(rng_t& rng)
 {
     answer_t answer;
+    answer.correct = get_number_in_range(10, 99, rng);
+    unsigned n2 = get_number_in_range(0, 9, rng);
+    unsigned n1 = n2 * answer.correct;
+
+    cout << endl << endl
+         << "   " << n1 << endl
+         << " /   " << n2 << endl
+         << "------" << endl
+         << "    ";
+
+    cin >> answer.given;
+
     return answer;
 }
 
