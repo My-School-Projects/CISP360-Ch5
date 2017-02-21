@@ -9,11 +9,15 @@ using namespace std;
 string get_name(istream& in, ostream& out);
 uint16_t get_number_of_students(istream& in, ostream& out);
 vector<string> get_students(istream& in, ostream& out);
-vector<string> sort_students(vector<string>&&);
+vector<string> sort_strings(vector<string>&&);
 bool file_contents_equal(ifstream&, ifstream&);
+void student_line_up(istream&, ostream&, ostream&);
+
+const bool TEST = false;
 
 int main()
 {
+    if (TEST)
     {
         ifstream test_input;
         test_input.open("test_input.txt", ifstream::in);
@@ -21,18 +25,20 @@ int main()
         test_output.open("test_output.txt", ofstream::out);
         stringstream null_out;
 
-        auto students = get_students(test_input, null_out);
-
-        students = sort_students(move(students));
-
-        for (size_t i = 0; i < students.size(); i++)
-        {
-            test_output << students[i] << endl;
-        }
-
-        test_input.close();
-        test_output.close();
+        // If we're testing, get input from `test_input`, send output
+        // to `test_output` and discard all prompts (send to `null_out`).
+        student_line_up(test_input, test_output, null_out);
     }
+    else
+    {
+        // If we're not testing, get input from cin,
+        // and send output and prompts to cout.
+        student_line_up(cin, cout, cout);
+    }
+
+    // If we're testing, assert that the contents of `test_output.txt`
+    // are the same as the contents of `test_input.txt`
+    if (TEST)
     {
         ifstream test_output;
         test_output.open("test_output.txt", ifstream::in);
@@ -56,27 +62,43 @@ int main()
 }
 
 ///
-/// Get a name from the user
+/// Gets a list of students from `in`, sorts them by name,
+/// and prints the first and last student to `out`.
+/// Prompts are sent to `prompt`.
+void student_line_up(istream& in, ostream& out, ostream& prompt)
+{
+    vector<string> students = get_students(in, prompt);
+
+    students = sort_strings(move(students));
+
+    out << "Student in front : " << students[0] << endl
+        << "Student in back  : " << students[students.size()-1] << endl;
+}
+
 ///
-string get_name(istream& in, ostream& out)
+/// Gets a name from `in` and returns it.
+/// Prompts are sent to `prompt`.
+///
+string get_name(istream& in, ostream& prompt)
 {
     string name;
-    out << "Please enter a student's name." << endl
+    prompt << "Please enter a student's name." << endl
         << ">> ";
     in >> name;
     return name;
 }
 
 ///
-/// Get the number of students from the user
+/// Gets the number of students from `in`, and returns it.
+/// Prompts are sent to `prompt`.
 ///
-uint16_t get_number_of_students(istream& in, ostream& out)
+uint16_t get_number_of_students(istream& in, ostream& prompt)
 {
     uint16_t number = 0;
 
     while(number < 1 or number > 25)
     {
-        out << "Please enter the number of students in line." << endl
+        prompt << "Please enter the number of students in line." << endl
              << ">> ";
         in >> number;
 
@@ -90,41 +112,50 @@ uint16_t get_number_of_students(istream& in, ostream& out)
     return number;
 }
 
-vector<string> get_students(istream& in, ostream& out)
+///
+/// Populates a `vector<string>` with names of students
+/// taken from `in`, and returns it.
+/// Prompts are sent to `prompt`.
+///
+vector<string> get_students(istream& in, ostream& prompt)
 {
-    uint16_t number_of_students = get_number_of_students(in, out);
+    uint16_t number_of_students = get_number_of_students(in, prompt);
 
     vector<string> students(number_of_students);
 
     for (uint16_t i = 0; i < number_of_students; i++)
     {
-        students[i] = get_name(in, out);
+        students[i] = get_name(in, prompt);
     }
 
     return students;
 }
 
 ///
-/// Sorts the students alphabetically
+/// Sorts a vector of strings alphabetically
 ///
-vector<string> sort_students(vector<string>&& students)
+vector<string> sort_strings(vector<string>&& strings)
 {
     // For now, bubble sort.
-    for (size_t i = 0; i < students.size(); i++)
+    for (size_t i = 0; i < strings.size(); i++)
     {
-        for (size_t j = 1; j < students.size(); j++)
+        for (size_t j = 1; j < strings.size(); j++)
         {
-            if (students[j-1].compare(students[j]) > 0)
+            if (strings[j-1].compare(strings[j]) > 0)
             {
-                string temp = students[j];
-                students[j] = students[j-1];
-                students[j-1] = temp;
+                string temp = strings[j];
+                strings[j] = strings[j-1];
+                strings[j-1] = temp;
             }
         }
     }
-    return students;
+    return strings;
 }
 
+///
+/// Returns `true` if the contents of `f1` are the same
+/// as the contents of `f2`.
+///
 bool file_contents_equal(ifstream& f1, ifstream& f2)
 {
     string s1, s2;

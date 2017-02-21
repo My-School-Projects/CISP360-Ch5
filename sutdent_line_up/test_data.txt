@@ -1,11 +1,2 @@
-Allee
-Daniel
-Doug
-Jackson
-Jacob
-Jerome
-Joe
-John
-Megan
-Michael
-Michelle
+Student in front : Allee
+Student in back  : Michelle
