@@ -9,3 +9,6 @@ workspace/
 *.depend
 *.layout
 *.o
+
+## Windows Visual Studio Workspace
+account_balance

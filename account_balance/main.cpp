@@ -1,57 +1,17 @@
 #include <iostream>
 #include <iomanip>
-#include <fstream>
-#include <sstream>
 #include <string>
 #include <limits>
 using namespace std;
 
-const bool TEST = false;
-
 void accout_balance(istream&, ostream&, ostream&);
-float input(istream&, ostream&, string);
-bool file_contents_equal(fstream&, ifstream&);
+float input(istream&, ostream&, bool, string);
 
 int main()
 {
-    if (TEST)
-    {
-        ifstream test_input;
-        test_input.open("test_input.txt");
-        fstream test_output;
-        test_output.open("test_output.txt");
-        stringstream null_out;
+    accout_balance(cin, cout, cout);
 
-        // If we're testing, get input from `test_input`, send output
-        // to `test_output`, and discard all prompts (send to `null_out`).
-        accout_balance(test_input, test_output, null_out);
-
-        ifstream test_data;
-        test_data.open("test_data.txt");
-
-        // We then test if the contents of `test_output` are the same
-        // as the contents of `test_data`. If they are, everything worked
-        // as expected. If not, something's wrong.
-        if (file_contents_equal(test_output, test_data))
-        {
-            cout << "Test passed" << endl;
-        }
-        else
-        {
-            cout << "Test failed" << endl;
-        }
-
-        test_input.close();
-        test_output.close();
-        test_data.close();
-    }
-    else
-    {
-        // If we're not testing, get input from `cin`,
-        // and send output and prompts to `cout`.
-        accout_balance(cin, cout, cout);
-    }
-
+	getchar();
     return 0;
 }
 
@@ -60,18 +20,50 @@ int main()
 /// and displays the account balance to `out`.
 /// Prompts are sent to `prompt`.
 ///
+/// @arg in - The stream to get input from (usually cin, or a file)
+/// @arg out - The stream to print output to, (usually cout, or a file)
+/// @arg prompt - The stream to print prompts to, (usually cout)
+///
 void accout_balance(istream& in, ostream& out, ostream& prompt)
 {
-    float monthly_interest_rate = input(in, prompt, "Please enter the annual interest rate for the account.\n>> %");
+    float monthly_interest_rate = input(in, prompt, false, "Please enter the annual interest rate for the account.\n>> %");
     monthly_interest_rate /= 1200;
+    float balance = input(in, prompt, false, "What was the starting balance?\n>> $");
+    unsigned months_since_opened = input(in, prompt, true, "How many months has the account been open?\n>> ");
+    float deposited = 0, withdrawn = 0, interest_earned = 0;
 
+    for (unsigned i = 1; i <= months_since_opened; i++)
+    {
+        deposited += input(in, prompt, false, "Please enter the amount deposited during month " + to_string(i) + ": \n>> $");
 
+        withdrawn += input(in, prompt, false, "Please enter the amount withdrawn during month " + to_string(i) + ": \n>> $");
+
+        balance = balance + deposited - withdrawn;
+        interest_earned = balance * monthly_interest_rate;
+        balance += interest_earned;
+    }
+
+    out << setprecision(2) << fixed
+		<< "Ending balance  : $" << balance << endl
+        << "Total deposited : $" << deposited << endl
+        << "Total withdrawn : $" << withdrawn << endl
+        << "Interest earned : $" << interest_earned << endl;
 }
 
-float input(istream& in, ostream& prompt_stream, string prompt)
+///
+/// Gets a number from `in`. If `integral` is true, it will only accept whole numbers.
+///
+/// @arg in - The stream to get input from (usually cin, or a file)
+/// @arg prompt_stream - The stream to print prompts to, (usually cout)
+/// @arg integral - If true, only whole numbers will be accepted as valid input
+/// @arg prompt - The prompt to be displayed to `prompt_stream` when requesting input
+///
+/// @return The number read from `in`
+///
+float input(istream& in, ostream& prompt_stream, bool integral, string prompt)
 {
     float number = -1;
-    while(number < 1)
+    while(number < 0)
     {
         prompt_stream << prompt;
         in >> number;
@@ -83,21 +75,4 @@ float input(istream& in, ostream& prompt_stream, string prompt)
         in.ignore(numeric_limits<streamsize>::max(), '\n');
     }
     return number;
-}
-
-///
-/// Returns `true` if the contents of `f1` are the same
-/// as the contents of `f2`.
-///
-bool file_contents_equal(fstream& f1, ifstream& f2)
-{
-    string s1, s2;
-    while(f1.good())
-    {
-        getline(f1, s1);
-        getline(f2, s2);
-        if (s1.compare(s2) != 0)
-            return false;
-    }
-    return true;
 }
