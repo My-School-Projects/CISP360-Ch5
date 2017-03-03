@@ -11,4 +11,12 @@ workspace/
 *.o
 
 ## Windows Visual Studio Workspace
-account_balance
+*.sdf
+*.sln
+*.suo
+*.vcxproj*
+*.lastbuildstate
+*.log
+*.tlog
+*.opensdf
+Debug
