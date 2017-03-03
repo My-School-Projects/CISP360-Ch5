@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include <string>
 #include <limits>
 using namespace std;
@@ -9,8 +10,12 @@ float input(istream&, ostream&, bool, string);
 
 int main()
 {
-    accout_balance(cin, cout, cout);
+	ofstream out;
+	out.open("output.txt");
 
+    accout_balance(cin, out, cout);
+
+	out.close();
 	getchar();
     return 0;
 }

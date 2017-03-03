@@ -1,0 +1,4 @@
+Ending balance  : $111.38
+Total deposited : $75.00
+Total withdrawn : $65.00
+Interest earned : $1.38
